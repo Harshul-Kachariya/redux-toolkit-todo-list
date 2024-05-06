@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  todos: [],
+  todos: JSON.parse(localStorage.getItem("todos")) || [],
 };
 
 export const todoSlice = createSlice({
@@ -14,18 +14,29 @@ export const todoSlice = createSlice({
         ...action.payload,
       };
       state.todos.push(todo);
+
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
     removeTodo: (state, action) => {
-      state.todos = state.todos.filter((todos) => todos.id !== action.payload);
+      const todos = JSON.parse(localStorage.getItem("todos"));
+      state.todos = todos.filter((todos) => todos.id !== action.payload);
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
+
     updateTodo: (state, action) => {
-      const { id, text, firstName, lastName, mobile } = action.payload;
-      const todoUpate = state.todos.find((todo) => todo.id === id);
-      if (todoUpate) {
-        todoUpate.todo = text;
-        todoUpate.firstName = firstName;
-        todoUpate.lastName = lastName;
-        todoUpate.mobile = mobile;
+      const todoList = window.localStorage.getItem("todos");
+      if (todoList) {
+        const todoListArr = JSON.parse(todoList);
+        todoListArr.forEach((todos) => {
+          if (todos.id === action.payload.id) {
+            todos.firstName = action.payload.firstName;
+            todos.lastName = action.payload.lastName;
+            todos.mobile = action.payload.mobile;
+            todos.todo = action.payload.todo;
+          }
+        });
+        window.localStorage.setItem("todos", JSON.stringify(todoListArr));
+        state.todoList = [...todoListArr];
       }
     },
   },
